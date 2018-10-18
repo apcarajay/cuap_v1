@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    {{ headContent() }}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+
+    
+    <title>CUAP: Codon Usage Analysis Package</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <!--<link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet"> -->
+    <!--<link href="vendor/bootstrap/css/bootstrap.css" rel="stylesheet">-->
+
+    <!-- Custom fonts for this template -->
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    
+    <!--
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Cabin:700' rel='stylesheet' type='text/css'> -->
+    
+    <!-- Custom styles for this template -->
+    <link href="css/grayscale.min.css" rel="stylesheet">
+
+    <!-- Custom table style for this template --> 
+    <link rel="stylesheet" href="datatables/css/dataTables.bootstrap4.min.css"> 
+    <!--for abled/disabled radio button -->
+	<script>
+
+		window.onload=function() {
+
+	    // first, disable all the input fields
+	    document.forms[0].elements["sequence"].disabled=true;
+	    document.forms[0].elements["accessno"].disabled=true;
+	    document.forms[0].elements["inputfile"].disabled=true;
+
+	    // next, attach the click event handler to the radio buttons
+	    var radios = document.forms[0].elements["group1"];
+		    for (var i = [0]; i < radios.length; i++){
+		  		radios[i].onclick=radioClicked;
+	    	}
+			    
+		}
+
+			function radioClicked() {
+
+			  // find out which radio button was clicked and
+			  // disable/enable appropriate input elements
+			  switch(this.value) {
+			    case "one" :
+			       document.forms[0].elements["sequence"].disabled=false;
+			       document.forms[0].elements["accessno"].disabled=true;
+			       document.forms[0].elements["inputfile"].disabled=true;
+			       break;
+			    case "two" :
+			       document.forms[0].elements["accessno"].disabled=false;
+			       document.forms[0].elements["sequence"].disabled=true;
+			       document.forms[0].elements["inputfile"].disabled=true;
+			       break;
+			    case "three" :
+			       document.forms[0].elements["inputfile"].disabled=false;
+			       document.forms[0].elements["sequence"].disabled=true;
+			       document.forms[0].elements["accessno"].disabled=true;
+			       break;
+			  }
+			}
+
+
+			var valid = false;
+
+			function validate_fileupload(input_element)
+			{
+			    var el = document.getElementById("feedback");
+			    var fileName = input_element.value;
+			    var allowed_extensions = new Array("fasta","txt");
+			    var file_extension = fileName.split('.').pop(); 
+			    for(var i = 0; i < allowed_extensions.length; i++)
+			    {
+			        if(allowed_extensions[i]==file_extension)
+			        {
+			            valid = true; // valid file extension
+			            el.innerHTML = "";
+			            return;
+			        }
+			    }
+			    el.innerHTML="Invalid file";
+			    el.form.reset();
+	            el.focus();
+			    valid = false;
+
+			}
+
+			  function readSingleFile(evt) {
+			    var f = evt.target.files[0];   
+			    if (f) {
+			      var r = new FileReader();
+			      r.onload = function(e) { 
+			          var contents = e.target.result;             
+			          var ct = r.result;
+			          var words = ct.split(' ');            
+			          alert(words[0]);
+			      }
+			      r.readAsText(f);
+			    } else { 
+			      alert("Failed to load file");
+			    }
+			  }
+
+  
+
+			function ValidateInputForm(input_element){
+				var sequence = document.getElementById("sequence");           
+				var accessno = document.getElementById("accessno");
+				//var inputfile = document.getElementById("inputfile");
+				//document.getElementById('inputfile').addEventListener('change', readSingleFile, false);
+				//var fileName = input_element.value;
+				var one = document.getElementById("one").checked;
+				var two = document.getElementById("two").checked;
+				var three = document.getElementById("three").checked;
+				var lines = sequence.value.split("\n");
+				var countseq = 0;
+				//var x = document.getElementById("inputfile").value;
+				
+
+
+				//window.alert(x);
+	    		if (sequence.value == "" && one == true){
+			        window.alert("Please enter your sequence(s).");
+			        sequence.focus();
+			        document.location.reload(true);
+			        return false;
+			    }
+
+			    if (sequence.value != "" && one == true){
+			        //window.alert(sequence.value);
+			        for(var j=0; j < lines.length; j++){
+			        	//window.alert("Line"+ j + "is : " + lines[j]);
+			        	
+			        	//window.alert(lines[j].indexOf(">"));
+
+			        	if(lines[0].indexOf(">") != 0){
+			        		//window.alert("Error: Missing annotation for the first sequence!!");
+			           		countseq = 0;
+			        		break;
+			        		//return false;
+
+			        	}else if (lines[j].indexOf(">",0) < 0){
+			        		//window.alert(lines[j] + ";= check if valid dna(ATGC)");
+			        		k = j + 1
+			        		/*if(lines[j] == ""){
+			        				window.alert("Invalid: No Sequence input @ line "+ k );
+			        				//window.alert("Line"+ j + "is : " + lines[j]);
+			        				document.location.reload(true);
+			        				return false;	
+			        		}
+			        		*/
+
+			        		var dna = lines[j].split("");
+			        		for( var i=0; i < dna.length; i++){
+			        			//window.alert(dna[i])
+			        			//k = j + 1
+			        			if(dna[i]== "A" || dna[i]=="T" || dna[i]=="G" || dna[i]=="C" ||  dna[i]== "a" || dna[i]=="t" || dna[i]=="g" || dna[i]=="c"){
+			        				//window.alert("valid input: "+ dna[i] + "\n @ line "+ k );
+			        				//window.alert("Line"+ j + "is : " + lines[j]);
+			        				//document.location.reload(true);
+			        				//return true;
+			        			}else{
+			        				window.alert("Invalid input: "+ dna[i] + "\n @ line "+ k );
+			        				//window.alert("Line"+ j + "is : " + lines[j]);
+			        				document.location.reload(true);
+			        				return false;
+			        			}
+			        		}
+			        		//window.alert(dna[1]);
+			        		
+			        	}else{
+			        		 countseq++;
+			        		 //window.alert("count is "+ countseq);
+			        	}
+
+			        }
+
+			        if(countseq > 0){
+			        	return true;
+			        } else if(countseq ==0){
+			        	window.alert("Error: Missing annotation for the first sequence!!");
+			        	sequence.focus();
+			        	document.location.reload(true); 
+			        	return false;
+			    	}else{
+			        	window.alert("Enter DNA sequence(s) with annotation!");
+			        	sequence.focus();
+			        	document.location.reload(true);
+			        	return false;
+			        }
+			        //sequence.focus();
+			        //document.location.reload(true);
+			        //return false;
+			    }
+
+			    if (accessno.value == "" && two == true){
+			        window.alert("Please enter your accession number(s).");
+			        accessno.focus();
+			        document.location.reload(true);
+			        return false;
+			    }   
+			    /*
+			    if (inputfile.value == "" && three == true){
+			        window.alert("Please enter your file in fasta or txt format.");
+			        inputfile.focus();
+			        document.location.reload(true);
+			        return false;
+			    }
+			    */
+	  			return true;
+			}
+						
+	</script>
+
+  </head>
+
+  <body id="page-top">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+      <div class="container">
+        <a class="navbar-brand js-scroll-trigger" href="#page-top">Codon Usage Analysis Package<a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          Menu
+          <i class="fa fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="#about">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="#download">Input</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="#summary">Summary</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="#output">Output</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="#ctable">TABLE</a>
+            </li>
+            <!--
+            <li class="nav-item">
+              <a class="nav-link js-scroll-trigger" href="#goplot">PLOT</a>
+            </li>
+        	-->
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Intro Header -->
+    <header class="masthead">
+      <div class="intro-body">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-8 mx-auto">
+              <h1 class="brand-heading">CUAP</h1> 
+              <p class="intro-text">A program for the codon usage pattern of different genomes using Maximum Likelihood Estimator (MLE) index.
+                <br></p>
+              <a href="#about" class="btn btn-circle js-scroll-trigger">
+                <i class="fa fa-angle-double-down animated"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- About Section -->
+    <section id="about" class="content-section text-center">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 mx-auto">
+            <h2>About CUAP</h2>
+            <p>CUAP accepts one or more DNA sequences and returns the codon usage value using Maximum Likelihood Estimator (MLE).
+            </p>
+            <p>All DNA sequences inputted should be in the CDS (coding DNA sequence) form. CDS is the protein-encoding region of the genome.</p>
+            <p>The accession number(s) inputted should match with the accession number(s) of the DNA sequence with the database of 
+            <a href="https://www.ncbi.nlm.nih.gov/nucleotide/"> https://www.ncbi.nlm.nih.gov/nucleotide/ </a> <br>
+            The uploaded file of DNA sequences should be in FASTA format.
+            </p>
+            <a href="#download" class="btn btn-circle js-scroll-trigger">
+               <i class="fa fa-angle-double-down animated"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Download Section -->
+    <section id="download" class="download-section content-section text-center">
+      <div class="container">
+        <div class="col-lg-12 mx-auto"  >
+          <!--<h2>INPUT SEQUENCE</h2>
+          <p>You can download Grayscale for free on the preview page at Start Bootstrap.</p>
+          <a href="http://startbootstrap.com/template-overviews/grayscale/" class="btn btn-default btn-lg">Visit Download Page</a>-->
+          <form id="picker" name="InputForm" class="attr-col shiny-input-radiogroup" method="post" enctype="multipart/form-data">
+          	<div class="form-group" >
+          		<input id="one" type="radio" name="group1" value="one" />
+                <label for="sequence"> Enter Sequence(s):</label>
+                <textarea name="Sequences" id="sequence" pattern="[ATGCatgc]" rows="7" cols="25" class="form-control" placeholder="Enter one or multiple sequence(s)" required="required"></textarea>
+
+            </div>	
+            <div class="form-group">
+            	<input id="two" type="radio" name="group1" value="two" /> 
+                <label for="accessno"> Enter Accession Number(s):    </label>
+                <input type="text" class="form-control" id="accessno" name="AccessNo" placeholder="User can enter multiple accession number(s) such as: JX275887.1, DQ861409.1, DQ861408.1" required="required"  />
+            </div>
+			<div class="form-group">
+				<input id="three" type="radio" name="group1" value="three" />
+			    <label for="inputfile">Upload:</label>
+			    <!--<input id="inputfile" name="Inputfile" type="file" accept=".fasta,.txt" onchange="validate_fileupload(this)" class="file" data-show-preview="false">-->
+			 
+				<input type="file" id="inputfile" name="inputfile" onchange="onChange(event)" accept=".fasta,.txt" class="file" placeholder="Please choose a .fasta or .txt file">	
+
+
+				
+			    <span id="feedback" style="color: red;"></span>
+			</div>
+			
+			<p id="file-content"></p>
+
+
+			<span id="note" class="form-text text-white"> &emsp; &emsp; &emsp; &emsp; NOTE: Input should be in the CDS (coding DNA sequence) form with the correct open reading frame (ORF).</span>
+			<a href="#download" class="btn js-scroll-trigger">
+				<button type="reset" id="form_reset" class="btn btn-default">Clear</button>
+			</a>
+			<a href="#summary" class="btn js-scroll-trigger">
+				<button type="submit" id="radio_value" value="true" onclick="return ValidateInputForm(this)" class="btn btn-default">Submit</button>
+			</a>
+			<div id="file-content"></div>
+
+
+			</form>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Summary Section -->
+
+        <!-- Download Section -->
+    <section id="summary" class=" content-section text-center">
+      <div class="container">
+	          {{ uiOutput("code1") }}
+	          <div id="loader" style="display: none;">
+		        Please wait image uploading to server....
+		    </div>
+	      <div id="mytable" >  
+
+	      	{{dataTableOutput('sumofdata')}} 
+
+	      </div>
+	      <div id="frm">
+	      	{{ uiOutput("code4") }}
+	      	{{ uiOutput("code5") }}
+	      </div>
+
+    	</div>
+    </section> 
+
+
+    <!-- Contact Section -->
+    <section id="contact" class="content-section text-center">
+      <div class="container">
+
+	    <div id="output"  class="content-section text-center">
+	      {{ uiOutput("code2") }}
+	       <!--{{plotOutput('plot1')}}-->
+	       {{dataTableOutput('precodontable')}}
+	       <div id="frm">
+	       {{ uiOutput("code6") }}
+	       {{ uiOutput("code7") }}
+	       </div>
+	    </div> 
+
+
+
+        <div id="ctable">  <!--class="col-lg-10 mx-auto"-->
+        	<br />
+        	<br />
+        	{{ uiOutput("code3") }}
+        	{{dataTableOutput('codonusagetable')}} 
+        	<div id="frm" >
+        	{{ uiOutput("code8")  }}
+			{{ uiOutput("code9")  }}
+			
+		    </div>
+
+
+        </div>
+      </div>
+
+      </div>
+    </section>
+
+    <section id="goplot" class=" content-section text-center">
+      <div class="container">
+	          {{   plotOutput('plot', width = "300px", height = "300px")}}
+	         <!-- {{   actionButton('goPlot', 'Go plot')}} -->
+	          <div id="loader" style="display: none;">
+		        Please wait image uploading to server....
+		    </div>
+    	</div>
+    </section> 
+
+
+
+
+    <!-- Footer -->
+    <footer>
+      <div class="container text-center">
+        <p>Copyright &copy; CUAP 2018</p>
+      </div>
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script> 
+		 $(document).ready(function() {
+		    $('#example').DataTable();
+
+		} );
+
+    </script>
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Bootstrap Table Javascript -->
+    <!--<script src="datatables/js/jquery.js"></script> -->
+    <!--<script src="vendor/jquery/jquery.js"></script> -->
+    <script src="datatables/js/jquery.dataTables.min.js"></script>
+    <script src="datatables/js/dataTables.bootstrap4.min.js"></script>
+
+
+    <!-- Plugin JavaScript  -->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Google Maps API Key - Use your own API key to enable the map feature. More information on the Google Maps API can be found at https://developers.google.com/maps/ -->
+    <!--<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRngKslUGJTlibkQ3FkfTxj3Xss1UlZDA&sensor=false"></script> -->
+
+    <!-- Custom scripts for this template -->
+    <script src="js/grayscale.min.js"></script>
+
+
+    	<!--- JQUERY for radio buttons ----->
+	<script type="text/javascript" src="js/radiobutton.js"></script>
+		<!-- JQuery for filestyle -->
+	<script type="text/javascript" src="js/bootstrap-filestyle.min.js"> </script>
+	<script type="text/javascript" src="js/tabletocsv.js" />
+
+   
+
+  </body>
+
+</html>
