@@ -1,0 +1,8 @@
+setwd("~/Desktop/cuap_v2")
+library("readxl", lib.loc="~/R/x86_64-pc-linux-gnu-library/3.4")
+library("shinyjs", lib.loc="~/R/x86_64-pc-linux-gnu-library/3.4")
+library("shinydashboard", lib.loc="~/R/x86_64-pc-linux-gnu-library/3.4")
+library("shiny", lib.loc="~/R/x86_64-pc-linux-gnu-library/3.4")
+runApp()
+runApp()
+runApp()
