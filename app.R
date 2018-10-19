@@ -225,10 +225,10 @@ shinyApp(
 		               	}else{
 		               		validSeq$invalid = TRUE
 	          				print(c("Sequence contains invalid input:", dnaletters[b]))
-	                   		validate(
-	            		   		need(invalid==TRUE, paste('Sequence contains invalid input:', dnaletters[b]))
+	                   		#validate(
+	            		   	#	need(invalid==TRUE, paste('Sequence contains invalid input:', dnaletters[b]))
 	            			
-					   		)
+					   		#)
 	          				
 	          				#validSeq$errorletter <- dnaletters[b]
 	          				validSeq$ret = 1
@@ -239,7 +239,7 @@ shinyApp(
 	          
 
 	            	if(invalid==TRUE){
-	            		print(c("INVALID SEQUENCE OIE",validSeq$invalid))
+	            		#print(c("INVALID SEQUENCE OIE",validSeq$invalid))
 	            		#validSeq$invalid = FALSE
 	            		#HTML()
 	            		validate(
@@ -878,10 +878,14 @@ shinyApp(
 
 		  #==========================PLOT=================
 
-		  #output$plot <- renderPlot({
+		  output$plot <- renderPlot({
 		    #input$goPlot # Re-run when button is clicked
 		    #analyzedCodon <- list()
-
+		    plotdata <- validSeq$sumtable
+		    print(plotdata)
+		    print(plotdata[,3])
+		    codonAnalyzed <- as.numeric(plotdata[,3])
+		    codonMean <- mean(codonAnalyzed)
 		    #print(c("NUm of codon analyzed:", validSeq$numcol))
 		    #print(c("time difference:", validSeq$timediff))
 		    #analyzedCodon <- append(analyzedCodon, validSeq$numcol)
@@ -908,8 +912,9 @@ shinyApp(
 		      #}
 		    #})
 
-		    #plot(dat$x, dat$y)
-		  #})
+		    hist(codonAnalyzed, main="Histogram of Number of Codon Analyzed",  breaks=5)
+		    abline(v = codonMean, col = "red", lwd=2)
+		  })
 		
     }),
 
