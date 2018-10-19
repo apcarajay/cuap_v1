@@ -66,17 +66,18 @@ shinyApp(
 		            
 		        }
 		        frow <- nrow[2:length(nrow)]  
-		        print(c("frow:",length(frow)))
+		        #print(c("frow:",length(frow)))
 		        #print(c("annotlist:", annotList))
-		        print(c("numofcodonList:", length(numofcodonList)))
+		        #print(c("numofcodonList:", length(numofcodonList)))
 		        validSeq$numcol<-sum(as.numeric(numofcodonList), na.rm = TRUE)
 		        #print(validSeq$numcol)
-		        print(c("Invalid value:"), validSeq$invalid)
+		        #print(c("Invalid value:"), validSeq$invalid)
 
 		        if(length(numofcodonList) != length(frow)){
 		        	#print("INVALID INPUT!!!! contains a non-ATGC value.")
 		        	HTML('<h3> INVALID INPUT!!!!<br /> Input contains a non-ATGC value </h3>')
 		        	validSeq$ret = 1
+		        	print(c("ret:",validSeq$ret))
 		        	return(validSeq$ret)
 		        }else{
 
@@ -110,6 +111,7 @@ shinyApp(
 	        	preferedindex=''
 	        	preferedcodon=''
 
+	        	#print(c("codon ret", validSeq$ret))
 	        	#print(acc)
 	        	#print(attr(seqlist,"description"))
 	        	#print(speciesAccessno[c])
@@ -223,6 +225,10 @@ shinyApp(
 		               	}else{
 		               		validSeq$invalid = TRUE
 	          				print(c("Sequence contains invalid input:", dnaletters[b]))
+	                   		validate(
+	            		   		need(invalid==TRUE, paste('Sequence contains invalid input:', dnaletters[b]))
+	            			
+					   		)
 	          				
 	          				#validSeq$errorletter <- dnaletters[b]
 	          				validSeq$ret = 1
@@ -232,7 +238,7 @@ shinyApp(
 	          		}
 	          
 
-	            	if(validSeq$invalid==TRUE){
+	            	if(invalid==TRUE){
 	            		print(c("INVALID SEQUENCE OIE",validSeq$invalid))
 	            		#validSeq$invalid = FALSE
 	            		#HTML()
@@ -331,6 +337,9 @@ shinyApp(
 		        		#print(totalcount[m,1])
 		        		if(newcut[n,3]==totalcount[m,1]){
 		        			TOTALCOUNT <- append(TOTALCOUNT, totalcount[m,2])
+		        		}else{
+		        			#print("error xa dai")
+		        			
 		        		}
 		        	}
 		        }
@@ -694,7 +703,7 @@ shinyApp(
 				if(validSeq$invalid == FALSE && validSeq$ret==2){
 					HTML('<h3>SUMMARY OF INPUT DATA</h3>')
 				}else{
-					HTML('<h3>INVALID INPUT!</h3>')
+					#HTML('<h3>INVALID INPUT!</h3>')
 				}   
 
    				
