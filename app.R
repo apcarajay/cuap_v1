@@ -375,7 +375,7 @@ shinyApp(
 					  	meanml<-rowMeans(mlist, na.rm = TRUE)
 					  	meanse<-rowMeans(selist, na.rm = TRUE)
 					    temptable <- data.frame(meanml, meanse)
-					  	View(temptable)
+					  	#View(temptable)
 					  	#MLE1 = 1
 
 				  return(cbind(meanml,meanse))
@@ -491,7 +491,7 @@ shinyApp(
 				LSEtable <- data.frame(AMINO, PREFERRED_CODON)
 				#View(LSEtable)
 
-				View(codontable)
+				#View(codontable)
 				write.table(codontable, file="codon_usage_table.csv", sep=",", row.names=FALSE)
 				validSeq$codontable <- codontable
 
@@ -559,7 +559,7 @@ shinyApp(
 				#print(pclist)
 				pretable$PREFERRED_CODON <- pclist
 
-				View(pretable)
+				#View(pretable)
 				validSeq$pretable <- pretable
 				#---------------- Write into table the preferred codon ----------------------
 				write.table(pretable, file="preferredcodontable.csv", sep=",", row.names=FALSE)
