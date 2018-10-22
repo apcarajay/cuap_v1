@@ -11,6 +11,8 @@ library(stringr)
 library(tidyr)
 library(shinycssloaders)
 library(shinyBS)
+library(shinyjs)
+library(V8) 
 #library(dplyr)
 #library(boot)   #Bootstrap functions
 #Cluster, factoextra, magrittr,NbClust package for generating heat maps
@@ -38,7 +40,7 @@ shinyApp(
 		validSeq <- reactiveValues()
 		validSeq$invalid = FALSE
 		validSeq$ret = 0
-		
+
 
 	    output$sumofdata <- renderDataTable({
 	    	radioval <- input$radioval
@@ -651,7 +653,7 @@ shinyApp(
 		output$precodontable <- renderDataTable({
 			#print(c("precodontable ret value:", validSeq$ret))
 			if(radiodata()!= 0){
-				if(validSeq$invalid == FALSE){
+				if(validSeq$invalid == FALSE && validSeq$ret==2){
 					pdata <- validSeq$pretable
 					psdata <- data.frame(pdata$myaminoname,  pdata$aminocode,  pdata$codongen, pdata$PREFERRED_CODON)
 
@@ -703,7 +705,7 @@ shinyApp(
 		})	
 
 		output$code1 <- renderUI({ 
-			print(c("ret:", validSeq$ret))  
+			#print(c("ret:", validSeq$ret))  
 			if(radiodata()!=0){
 				if(validSeq$invalid == FALSE && validSeq$ret==2){
 					HTML('<h3>SUMMARY OF INPUT DATA</h3>')
@@ -766,6 +768,11 @@ shinyApp(
   		})
 
   		output$code5 <- renderUI({    
+  			#print(c("validSeq$ret is", validSeq$ret))
+  			#print(c("validSeq$invalid is ", validSeq$invalid))
+  			#print(c("radiodata() = ", radiodata() ))
+  			#onclick="javascript:document.getElementById(\'picker\').reset();"
+  			
 			if(radiodata()!=0){		
 				if(validSeq$invalid == FALSE && validSeq$ret == 2){
 		      	   HTML('&nbsp; <a href="#output" class="btn js-scroll-trigger" >
@@ -776,20 +783,20 @@ shinyApp(
 
 	      			print("SAMOKA OIE")
 	      			
-	      			validSeq$ret = 2
+	      			validSeq$ret = 0
 	      			print(validSeq$ret)
 
 	      			tags$a(href="javascript:history.go(0)", 
            			popify(tags$i(class="fa fa-refresh fa-5x"),
                  	title = "Reload", 
                   	content = "Click here to restart the Shiny session",
-                  	placement = "right"))
-	      			HTML(' <br />
-						<a href="#download" >
-		      	    	<button  onclick="javascript:document.getElementById(\'picker\').reset();" class="btn btn-default"> BACK TO INPUT </button> </a>
-						<br />
-					<br /> <br /> <br /> <br /> <br />  <br /> <br /> <br /> <br /> <br /> <br /> <br />
-   					')
+                  	placement = "center"))
+	      			#HTML(' <br />
+					#	<a href="#download" >
+		      	    #	<button type="reset" id="form_reset" onclick="this.form.reset();" class="btn btn-default"> PAHIMOYONG </button> </a>
+					#	<br />
+					#<br /> <br /> <br /> <br /> <br />  <br /> <br /> <br /> <br /> <br /> <br /> <br />
+   					#')
    					
 	      			#print(validSeq$invalid)
 	      		}
@@ -838,18 +845,19 @@ shinyApp(
   		output$code10 <- renderUI({
   		#onclick="javascript:document.getElementById(\'picker\').reset();"   
 			if(radiodata()!=0){	
-				if(validSeq$invalid == FALSE && validSeq$ret == 2){	
-					tags$a(href="javascript:history.go(0)", 
-           popify(tags$i(class="fa fa-refresh fa-5x"),
-                  title = "Reload", 
-                  content = "Click here to restart the Shiny session",
-                  placement = "right"))	
-		      	    #HTML('&nbsp;<a href="#download" >
-		      	    #	<br />
-		      	   # 	<br />
-		      	    #	<button type="reset" id="form_reset" class="btn btn-default"> BALIK </button> </a>
-					#	<br />
-	   				#') 
+				if(validSeq$invalid == FALSE && validSeq$ret == 2){
+
+					#tags$a(href="javascript:history.go(0)", 
+           			#popify(tags$i(class="fa fa-refresh fa-5x"),
+                  #title = "Reload", 
+                  #content = "Click here to restart the Shiny session",
+                  #placement = "right"))	
+		      	    HTML('&nbsp;<a href="#download" >
+		      	    	<br />
+		      	    	<br /> 
+		      	    	<button type="reset" id="form_reset" onclick="javascript:history.go(0)" class="btn btn-default"> BALIK </button> </a>
+				    	<br />
+	   				') 
 
 	      		}
    			} 
@@ -918,7 +926,7 @@ shinyApp(
 		    #plotdata <- read.csv("summary_of_input_data.csv", header = TRUE)
 		    plotdata <- validSeq$sumtable
 		    #colnames(plotdata) <- c("Sequence_no","Sequence(s)", "Number_of_Codons_Analyzed")
-		    View(plotdata)
+		    #View(plotdata)
 		    #print(plotdata)
 		    #print(is.null(plotdata[,3]))
 		    codonAnalyzed <- as.numeric(plotdata[,3])
@@ -936,8 +944,8 @@ shinyApp(
 		    		abline(v = codonMean, col = "red")
 		    	}
 			}else{
-				print("no plot")
-				plot.new()
+				#print("no plot")
+				#plot.new()
 				#require(cowplot)
 				#theme_set(theme_cowplot(font_size=12)) # reduce default font size
 				#View(mpg)
