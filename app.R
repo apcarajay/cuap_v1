@@ -10,17 +10,11 @@ library(plyr)
 library(stringr)
 library(tidyr)
 library(shinycssloaders)
-library(shinyBS)
-library(shinyjs)
-library(V8) 
+#library(shinyBS)
+#library(shinyjs)
+#library(V8) 
 #library(dplyr)
-#library(boot)   #Bootstrap functions
-#Cluster, factoextra, magrittr,NbClust package for generating heat maps
-#library(cluster)
-#library(factoextra)
-#library(magrittr)
-#library(NbClust)
-#library(gplots)
+#library(boot)  
 
 
 shinyApp(
@@ -768,11 +762,7 @@ shinyApp(
   		})
 
   		output$code5 <- renderUI({    
-  			#print(c("validSeq$ret is", validSeq$ret))
-  			#print(c("validSeq$invalid is ", validSeq$invalid))
-  			#print(c("radiodata() = ", radiodata() ))
-  			#onclick="javascript:document.getElementById(\'picker\').reset();"
-  			
+ 			
 			if(radiodata()!=0){		
 				if(validSeq$invalid == FALSE && validSeq$ret == 2){
 		      	   HTML('&nbsp; <a href="#output" class="btn js-scroll-trigger" >
@@ -781,24 +771,18 @@ shinyApp(
 		        	')
 	      		}else{
 
-	      			print("SAMOKA OIE")
-	      			
-	      			validSeq$ret = 0
-	      			print(validSeq$ret)
-
-	      			tags$a(href="javascript:history.go(0)", 
-           			popify(tags$i(class="fa fa-refresh fa-5x"),
-                 	title = "Reload", 
-                  	content = "Click here to restart the Shiny session",
-                  	placement = "center"))
-	      			#HTML(' <br />
-					#	<a href="#download" >
-		      	    #	<button type="reset" id="form_reset" onclick="this.form.reset();" class="btn btn-default"> PAHIMOYONG </button> </a>
-					#	<br />
-					#<br /> <br /> <br /> <br /> <br />  <br /> <br /> <br /> <br /> <br /> <br /> <br />
-   					#')
+	      			#tags$a(href="javascript:history.go(0)", 
+           			#popify(tags$i(class="fa fa-refresh fa-5x"),
+                 	#title = "Reload", 
+                  	#content = "Click here to restart the Shiny session",
+                  	#placement = "center"))
+		      	    HTML('&nbsp;<a href="#download" >
+		      	    	<br />
+		      	    	<br /> 
+		      	    	<button type="reset" id="form_reset" onclick="javascript:history.go(0)" class="btn btn-default"> BACK TO INPUT </button> </a>
+				    	<br />
+	   				') 
    					
-	      			#print(validSeq$invalid)
 	      		}
    			} 
   		})
@@ -855,7 +839,7 @@ shinyApp(
 		      	    HTML('&nbsp;<a href="#download" >
 		      	    	<br />
 		      	    	<br /> 
-		      	    	<button type="reset" id="form_reset" onclick="javascript:history.go(0)" class="btn btn-default"> BALIK </button> </a>
+		      	    	<button type="reset" id="form_reset" onclick="javascript:history.go(0)" class="btn btn-default"> BACK TO INPUT </button> </a>
 				    	<br />
 	   				') 
 
