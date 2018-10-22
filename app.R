@@ -9,6 +9,8 @@ library(hash)
 library(plyr)
 library(stringr)
 library(tidyr)
+library(shinycssloaders)
+library(shinyBS)
 #library(dplyr)
 #library(boot)   #Bootstrap functions
 #Cluster, factoextra, magrittr,NbClust package for generating heat maps
@@ -94,6 +96,8 @@ shinyApp(
 					#print(validSeq$timediff)
 					validSeq$ret = 2
 					sumtable
+
+
 				}
 			} 
 
@@ -119,7 +123,7 @@ shinyApp(
 	        	#print(acc)
 	        	if(is.null(seqlist) || seqlist=="" || is.na(seqlist)==TRUE){return()}
 
-	        	withProgress(message = 'Working on codon', value = 0, {
+	        	withProgress(message = 'Working on codon', value = 0, style = getShinyOption("progress.style", default = "notification"),{
 		        # Number of times we'll go through the loop
 		      	n1 <- length(seqlist)
 
@@ -225,10 +229,10 @@ shinyApp(
 		               	}else{
 		               		validSeq$invalid = TRUE
 	          				print(c("Sequence contains invalid input:", dnaletters[b]))
-	                   		#validate(
-	            		   	#	need(invalid==TRUE, paste('Sequence contains invalid input:', dnaletters[b]))
+	                   		validate(
+	            		   		need(invalid==TRUE, paste('Sequence contains invalid input:', dnaletters[b]))
 	            			
-					   		#)
+					   		)
 	          				
 	          				#validSeq$errorletter <- dnaletters[b]
 	          				validSeq$ret = 1
@@ -276,7 +280,7 @@ shinyApp(
 	          		allaminonames <- append(allaminonames, amino_name)
 
 	          		# Increment the progress bar, and update the detail text.
-			        incProgress(1/n1, detail = paste(": Calculating ", n1, "sequence(s)"))
+			        incProgress(1/n1, detail = paste(": Analyzing ", n1, "sequence(s)"))
 			        #print(c("n1:",n1))
 			        # Pause for 0.1 seconds to simulate a long computation.
 			        Sys.sleep(0.1)   
@@ -698,7 +702,8 @@ shinyApp(
 
 		})	
 
-		output$code1 <- renderUI({   
+		output$code1 <- renderUI({ 
+			print(c("ret:", validSeq$ret))  
 			if(radiodata()!=0){
 				if(validSeq$invalid == FALSE && validSeq$ret==2){
 					HTML('<h3>SUMMARY OF INPUT DATA</h3>')
@@ -708,12 +713,12 @@ shinyApp(
 
    				
    			} else {
-   				HTML('<h3> NO INPUT YET </h3>
-						<a href="#download" >
-		      	    	<button  onclick="javascript:document.getElementById(\'picker\').reset();" class="btn btn-default"> BACK TO INPUT</button> </a>
-						<br />
-					<br /> <br /> <br /> <br /> 
-   				')
+   				#HTML('<h3> NO INPUT YET </h3>
+				#		<a href="#download" >
+		      	#    	<button  onclick="javascript:document.getElementById(\'picker\').reset();" class="btn btn-default"> BACK TO INPUT</button> </a>
+				#		<br />
+				#	<br /> <br /> <br /> <br /> 
+   				#')
    			}
   		})
 
@@ -723,14 +728,15 @@ shinyApp(
 					HTML('<h3>SUMMARY OF PREFERRED CODON</h3>')
 				}   				
    				
-   			} else {
-   				HTML('<h3> NO INPUT YET </h3>
-						<a href="#download" >
-		      	    	<button  onclick="javascript:document.getElementById(\'picker\').reset();" class="btn btn-default"> BACK TO INPUT </button> </a>
-						<br />
-					<br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br />
-   				')
    			}
+   			# else {
+   			#	HTML('<h3> NO INPUT YET </h3>
+			#			<a href="#download" >
+		    #  	    	<button  onclick="javascript:document.getElementById(\'picker\').reset();" class="btn btn-default"> BACK TO INPUT </button> </a>
+			#			<br />
+			#		<br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br /> <br />
+   			#	')
+   			#}
   		})
 
 
@@ -740,14 +746,15 @@ shinyApp(
 				if(validSeq$invalid == FALSE && validSeq$ret == 2){
    					HTML('<h3> <br /> <br/> Codon Usage Table </h3>')
    				}
-   			} else {
-   				HTML('<h3> NO INPUT YET </h3>
-						<a href="#download" >
-		      	    	<button  onclick="javascript:document.getElementById(\'picker\').reset();" class="btn btn-default"> BACK TO INPUT </button> </a>
-						<br />
-					<br /> <br /> <br /> <br /> <br />  <br /> <br /> <br /> <br /> <br /> <br /> <br />
-   				')
-   			}
+   			} 
+   			#else {
+   			#	HTML('<h3> NO INPUT YET </h3>
+			#			<a href="#download" >
+		    #  	    	<button  onclick="javascript:document.getElementById(\'picker\').reset();" class="btn btn-default"> BACK TO INPUT </button> </a>
+			#			<br />
+			#		<br /> <br /> <br /> <br /> <br />  <br /> <br /> <br /> <br /> <br /> <br /> <br />
+   			#	')
+   			#}
   		})
 
   		output$code4 <- renderUI({  
@@ -771,6 +778,12 @@ shinyApp(
 	      			
 	      			validSeq$ret = 2
 	      			print(validSeq$ret)
+
+	      			tags$a(href="javascript:history.go(0)", 
+           			popify(tags$i(class="fa fa-refresh fa-5x"),
+                 	title = "Reload", 
+                  	content = "Click here to restart the Shiny session",
+                  	placement = "right"))
 	      			HTML(' <br />
 						<a href="#download" >
 		      	    	<button  onclick="javascript:document.getElementById(\'picker\').reset();" class="btn btn-default"> BACK TO INPUT </button> </a>
@@ -813,14 +826,36 @@ shinyApp(
 
   		output$code9 <- renderUI({   
 			if(radiodata()!=0){	
-				if(validSeq$invalid == FALSE && validSeq$ret == 2){		
-		      	    HTML('&nbsp;<a href="#download" >
-		      	    	<button  onclick="javascript:document.getElementById(\'picker\').reset();" class="btn btn-default"> BACK TO INPUT </button> </a>
-						<br />
-	   				')
+				if(validSeq$invalid == FALSE && validSeq$ret == 2){	
+		      	   HTML('&nbsp; <a href="#cplot" class="btn js-scroll-trigger" >
+		            <button class="btn btn-default">NEXT</button>
+		        	</a>
+		        	')
 	      		}
    			} 
-  		})     	   
+  		})
+
+  		output$code10 <- renderUI({
+  		#onclick="javascript:document.getElementById(\'picker\').reset();"   
+			if(radiodata()!=0){	
+				if(validSeq$invalid == FALSE && validSeq$ret == 2){	
+					tags$a(href="javascript:history.go(0)", 
+           popify(tags$i(class="fa fa-refresh fa-5x"),
+                  title = "Reload", 
+                  content = "Click here to restart the Shiny session",
+                  placement = "right"))	
+		      	    #HTML('&nbsp;<a href="#download" >
+		      	    #	<br />
+		      	   # 	<br />
+		      	    #	<button type="reset" id="form_reset" class="btn btn-default"> BALIK </button> </a>
+					#	<br />
+	   				#') 
+
+	      		}
+   			} 
+  		}) 
+
+
    				
 		#===================================================================================
 		# downloadfile handler
@@ -879,41 +914,42 @@ shinyApp(
 		  #==========================PLOT=================
 
 		  output$plot <- renderPlot({
-		    #input$goPlot # Re-run when button is clicked
 		    #analyzedCodon <- list()
+		    #plotdata <- read.csv("summary_of_input_data.csv", header = TRUE)
 		    plotdata <- validSeq$sumtable
-		    print(plotdata)
-		    print(plotdata[,3])
+		    #colnames(plotdata) <- c("Sequence_no","Sequence(s)", "Number_of_Codons_Analyzed")
+		    View(plotdata)
+		    #print(plotdata)
+		    #print(is.null(plotdata[,3]))
 		    codonAnalyzed <- as.numeric(plotdata[,3])
+		    SequenceNo <- as.numeric(plotdata[,1])
+		    freq <- count(codonAnalyzed)
 		    codonMean <- mean(codonAnalyzed)
-		    #print(c("NUm of codon analyzed:", validSeq$numcol))
-		    #print(c("time difference:", validSeq$timediff))
-		    #analyzedCodon <- append(analyzedCodon, validSeq$numcol)
 
-		    #print(c("List of codon analyzed: ", analyzedCodon))
-
-		    # Create 0-row data frame which will be used to store data
-		    #dat <- data.frame(x = numeric(0), y = numeric(0))
-
-		    #withProgress(message = 'Making plot', value = 0, {
-		      # Number of times we'll go through the loop
-		     # n <- 10
-
-		      #for (i in 1:n) {
-		        # Each time through the loop, add another row of data. This is
-		        # a stand-in for a long-running computation.
-		      # dat <- rbind(dat, data.frame(x = rnorm(1), y = rnorm(1)))
-
-		        # Increment the progress bar, and update the detail text.
-		    #    incProgress(1/n, detail = paste("Doing part", i))
-
-		        # Pause for 0.1 seconds to simulate a long computation.
-		    #    Sys.sleep(0.1)
-		      #}
-		    #})
-
-		    hist(codonAnalyzed, main="Histogram of Number of Codon Analyzed",  breaks=5)
-		    abline(v = codonMean, col = "red", lwd=2)
+			if(radiodata()!=0){	
+				#print(validSeq$invalid)
+				#print(validSeq$ret)
+				if(validSeq$invalid == FALSE && validSeq$ret == 2){
+		    		#qplot(data=plotdata, aes(plotdata$codonAnalyzed)) + geom_histogram()
+		    		#xlim=c(100,700),
+		    		hist(codonAnalyzed, main="Histogram for Number of Codon Analyzed", xlab="Codon Analyzed", border="green", col="blue",  las=1, breaks=5)
+		    		abline(v = codonMean, col = "red")
+		    	}
+			}else{
+				print("no plot")
+				plot.new()
+				#require(cowplot)
+				#theme_set(theme_cowplot(font_size=12)) # reduce default font size
+				#View(mpg)
+				#plot.mpg <- ggplot(mpg, aes(x = cty, y = hwy, colour = factor(cyl))) + 
+				#  geom_point(size=2.5)
+				#View(diamonds)
+				#plot.diamonds <- ggplot(diamonds, aes(clarity, fill = cut)) + geom_bar() +
+				#  theme(axis.text.x = element_text(angle=70, vjust=0.5))
+				#plot.codon <- ggplot(plotdata, aes(codonAnalyzed, fill = 'codonAnalyzed')) + geom_bar() +
+			
+				#plot_grid(plot.mpg, plot.diamonds,  labels = c('A', 'B'))
+			}
 		  })
 		
     }),
