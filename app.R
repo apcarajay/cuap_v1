@@ -41,7 +41,7 @@ shinyApp(
 	    	validSeq$beforetime <- Sys.time()  
 	        #btime <- system.time()
 	        #print(btime)	
-	        #print(c("Before time:", validSeq$beforetime))
+	        print(c("Before time:", validSeq$beforetime))
 	        #print(validSeq$beforetime)
 
 	    	if(is.null(radioval)){return()}
@@ -68,7 +68,7 @@ shinyApp(
 		        #print(c("annotlist:", annotList))
 		        #print(c("numofcodonList:", length(numofcodonList)))
 		        validSeq$numcol<-sum(as.numeric(numofcodonList), na.rm = TRUE)
-		        #print(validSeq$numcol)
+		        print(validSeq$numcol)
 		        #print(c("Invalid value:"), validSeq$invalid)
 
 		        if(length(numofcodonList) != length(frow)){
@@ -87,7 +87,7 @@ shinyApp(
 					validSeq$aftertime <- Sys.time() 
 					validSeq$timediff <- Sys.time() - validSeq$beforetime
 					#stime <- system.time()
-					#print(c("After time:", validSeq$aftertime))
+					print(c("After time:", validSeq$aftertime))
 					#print(validSeq$aftertime)
 					#print(validSeq$timediff)
 					validSeq$ret = 2
@@ -924,8 +924,16 @@ shinyApp(
 				if(validSeq$invalid == FALSE && validSeq$ret == 2){
 		    		#qplot(data=plotdata, aes(plotdata$codonAnalyzed)) + geom_histogram()
 		    		#xlim=c(100,700),
-		    		hist(codonAnalyzed, main="Histogram for Number of Codon Analyzed", xlab="Codon Analyzed", border="green", col="blue",  las=1, breaks=5)
+		    		#prob = TRUE  #for density instead of frequency
+		    		hist(codonAnalyzed, main="Histogram for Number of Codon Analyzed", xlab="Codon Analyzed", col="peachpuff", prob = TRUE, border="black",  las=1, breaks=5)
 		    		abline(v = codonMean, col = "red")
+		    		lines(density(codonAnalyzed), lwd = 2, col = "blue")
+		    		#curve(codonAnalyzed, lwd = 2, col = "blue")
+		    		abline(v = median(codonAnalyzed), col = "green", lwd = 2)
+		    		legend(x = "topright", # location of legend within plot area
+						 c("Density plot", "Mean", "Median"),
+						 col = c("blue", "red", "green"),
+						 lwd = c(2, 2, 2))
 		    	}
 			}else{
 				#print("no plot")
@@ -942,6 +950,37 @@ shinyApp(
 			
 				#plot_grid(plot.mpg, plot.diamonds,  labels = c('A', 'B'))
 			}
+		  })
+
+		  #========================= RUNNING TIME PLOT ===============================
+		  output$rplot <- renderPlot({
+		  	print("plot for running time..")
+		  	print(validSeq$timediff)
+		  	#rtimelist = dim(0)
+
+
+		  	if(is.null(validSeq$timediff) == TRUE){
+		  		print("NULL TIME")
+		  	}else{
+		  		#rtimelist <- data.frame(validSeq$timediff)
+		  		#tfile <- read.table("runtime_vs_filesize.csv", header = TRUE, sep="")
+		  		#View(tfile)
+		  		#plot(runtime)
+		  		runtime = list()
+		  		runtime = c(1.24619, 2.711698, 4.276526, 7.130111, 8.649589, 11.5595, 13.458, 15.9524, 21.47348, 22.37731, 24.59345, 26.57147, 32.95003, 37.10814, 42.20026)
+		  		totalCodonAnalyzed = c(314701, 629402, 944103, 1258804, 1573505, 1888206, 2202907, 2517608, 2832309, 3147010,3461711, 3776412, 4091113, 4405814, 4720515)
+		  		filesize = 1:15
+
+		  		runtime.tb <- data.frame(filesize, runtime, totalCodonAnalyzed)
+		  		View(runtime.tb)
+
+		  		require(cowplot)
+				theme_set(theme_cowplot(font_size=12)) # reduce default font size
+				plot.rtime <- ggplot(runtime.tb, aes(x = filesize, y = runtime, colour = factor(runtime))) + geom_point(size=2.5)
+				plot.tcodon <- ggplot(runtime.tb, aes(x = totalCodonAnalyzed, y = runtime, colour = factor(totalCodonAnalyzed))) + geom_point(size=2.5)								
+				plot_grid(plot.rtime, plot.tcodon, labels = c('Runtime(secs) vs. Filesize(mb)', 'Runtime(secs) vs. Total Number of Codon Analyzed'))
+		  	}
+	
 		  })
 		
     }),
